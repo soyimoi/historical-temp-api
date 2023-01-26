@@ -1,5 +1,7 @@
 # historical-temp-api
-API calling for any historical date and city after  1st Jan, 2010
+# https://www.weatherapi.com/docs/
+
+API calling for any historical date and city after  1st Jan, 2010 
 
 
 I created this program to help me with my temperature blanket crochet project for 2023.
