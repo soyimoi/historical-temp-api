@@ -1,15 +1,14 @@
-from calendar import c
-import datetime as dt
-from datetime import timezone
+from datetime import datetime
 import requests
 from csv import writer
+import pandas as pd
 
 
 # Set up of the API call 
-# If api_key throws an error, add the full file path where you key is stored 
+# If the api_key variable throws an error, add the full file path where you key is stored 
 
 b_url = "http://api.weatherapi.com/v1/history.json?key="
-api_key = open('API-key.txt', 'r').read()
+api_key = open('/Users/soyimoi/Downloads/Python Projects/Historical Weather/API-key.txt', 'r').read()
 city = "Kiruna" 
 
 # Date must be formatted as yyyy-mm-dd
@@ -20,15 +19,6 @@ h_date = '2023-01-01'
 
 url = b_url + api_key + '&q=' + city + '&dt=' + h_date
 
-# My color mapping
-
-dark_green = [-17, -16, -15, -14, -13, -12, -11, -10, -9]
-light_green = [-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
-beige = [6, 7, 8, 9, 10, 11]
-light_brown = [12, 13, 14, 15, 16, 17]
-dark_orange = [18, 19, 20, 21, 22, 23]
-
-
 
 
 with open('Historical_Weather.csv', 'w', encoding='utf8', newline='') as f:
@@ -37,11 +27,24 @@ with open('Historical_Weather.csv', 'w', encoding='utf8', newline='') as f:
     w = writer(f)
     w.writerow(header)
     
-    # Specify the dates you would like to retrieve data from formatted as yyyy-mm-dd
+    # Specify the dates you would like to retrieve data from - format yyyy-mm-dd) 
+    # First we select our desired range
+    
+    my_dates = pd.date_range(start="2023-01-23",end="2023-02-02")
+    
+    
+    # Then we twick the format so our dates are str and not datetime objects
+    
+    my_final_dates = []
 
-    my_dates = ['2023-01-22','2023-01-23', '2023-01-24']
+    for dtobj in my_dates:
+        dtobj = dtobj.strftime('%Y-%m-%d')
+        my_final_dates.append(dtobj)
+        
 
-    for date in my_dates:
+    # Now we can loop through the dates and get the information we need 
+
+    for date in my_final_dates:
         h_date = date
         curr_url = b_url + api_key + '&q=' + city + '&dt=' + h_date
         
@@ -56,17 +59,17 @@ with open('Historical_Weather.csv', 'w', encoding='utf8', newline='') as f:
             min_temp = int(r['forecast']["forecastday"][0]["day"]["mintemp_c"])
             avg_temp = int(r['forecast']["forecastday"][0]["day"]["avgtemp_c"])
 
-            if avg_temp <= -18:
+            if min_temp <= -18:
                 color = 'White'
-            elif avg_temp in dark_green:
+            elif min_temp in range(-17, -8):
                 color = 'Dark Green'
-            elif avg_temp in light_green:
+            elif min_temp in range(-8, 6):
                 color = 'Light Green'
-            elif avg_temp in beige:
+            elif min_temp in range(6, 12):
                 color = 'Beige'
-            elif avg_temp in light_brown:
+            elif min_temp in range(12, 18):
                 color = 'Light Brown'
-            elif avg_temp in dark_orange:
+            elif min_temp in range(18, 24):
                 color = 'Dark Orange'
             else:
                 color = 'Dark Brown'
